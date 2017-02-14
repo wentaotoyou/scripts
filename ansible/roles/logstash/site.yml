@@ -1,4 +1,5 @@
 ---
 - hosts: test
+  remote_user: tomcat
   roles:
     - role: logstash
