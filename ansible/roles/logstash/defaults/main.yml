@@ -7,7 +7,7 @@ logstash_version: 2.4.1
 logstash_redis_host: '172.18.200.222'
 logstash_redis_port: 6379
 logstash_redis_db: 0
-logstash_redis_key: 'logstash:tomcat'
+logstash_redis_key: 'logstash:tomat'
 logstash_redis_data_type: channel
 
 logstash_home_dir: "/hrb_data"
@@ -45,5 +45,5 @@ logstash_ls_open_files: 16384
 #geoip_database_extracted_filename: GeoLiteCity.dat
 #geoip_database: /etc/logstash/geoip/{{ geoip_database_extracted_filename }}
 
-logfile_path: "/hrb_log/catalina/hrb_*.out"
+logfile_path: "/hrb_log/catalina/hrb-*.out"
 logfile_sincedb_path: "{{ logstash_home_dir }}/logstash-{{ logstash_version }}"
