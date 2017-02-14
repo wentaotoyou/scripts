@@ -1,0 +1,35 @@
+input {
+    file {
+        path => "{{ logfile_path }}"
+        #start_position  =>  "beginning"
+        type    =>  "tomcat"
+		# sincedb =>  "{{ logstash_home_dir }}/{{ logstash_version }}"
+		sincedb_path =>  "{{ logfile_sincedb_path }}/sincedb"
+
+        codec  =>  multiline {
+            pattern => "^%{TIMESTAMP_ISO8601}"
+            negate  =>  true
+            what    =>  "previous"
+        }
+    }
+}
+
+filter {
+    grok {
+        match => { "message" => "%{TIMESTAMP_ISO8601:timestamp} %{DATA:httpxx} %{LOGLEVEL:severity} %{GREEDYDATA:syslog_message}"}
+    }
+
+    date {
+        match => ["timestamp", "yyyy-MM-dd HH:mm:ss,SSS"]
+    }
+}
+
+output {
+    redis {
+        host        =>  "{{ logstash_redis_host }}"
+        port        =>  "{{ logstash_redis_port }}"
+        db          =>  "{{ logstash_redis_db }}"
+        data_type   =>  "{{ logstash_redis_data_type }}"
+        key         =>  "{{ logstash_redis_key }}"
+    }
+}

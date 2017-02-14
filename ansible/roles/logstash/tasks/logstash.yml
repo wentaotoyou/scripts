@@ -1,0 +1,30 @@
+---
+
+- name: Deploy logstash
+  unarchive:
+    src: logstash-{{ logstash_version }}.tar.gz
+    dest: "{{ logstash_home_dir }}"
+    creates: "{{ logstash_home_dir }}/logstash-{{ logstash_version }}"
+    copy: yes
+    owner: tomcat
+    group: tomcat
+    # mode: ''
+
+- name: copy startup script
+  template:
+    src: reload.sh.j2
+    dest: "{{ logstash_home_dir }}/logstash-{{ logstash_version }}/reload.sh"
+    owner: tomcat
+    group: tomcat
+    # mode: 0644
+
+- name: copy shipper templates
+  template:
+    src: shipper.conf.j2
+    dest: "{{ logstash_home_dir }}/logstash-{{ logstash_version }}/shipper.conf"
+    owner: tomcat
+    group: tomcat
+    # mode: 0644
+  notify:
+    - restart logstash
+  tags: reconfig

@@ -1,0 +1,3 @@
+---
+- name: restart logstash
+  shell: bash {{ logstash_home_dir }}/logstash-{{ logstash_version }}/reload.sh
