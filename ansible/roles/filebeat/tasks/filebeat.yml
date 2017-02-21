@@ -1,0 +1,38 @@
+---
+
+- name: Deploy filebeat
+  unarchive:
+    src: filebeat-{{ filebeat_version }}.tar.gz
+    dest: "{{ filebeat_home_dir }}"
+    creates: "{{ filebeat_home_dir }}/filebeat-{{ filebeat_version }}"
+    copy: yes
+    owner: tomcat
+    group: tomcat
+    # mode: ''
+
+- name: copy startup script
+  template:
+    src: reload.sh.j2
+    dest: "{{ filebeat_home_dir }}/filebeat-{{ filebeat_version }}/reload.sh"
+    owner: tomcat
+    group: tomcat
+    # mode: 0644
+    
+- name: copy stop script
+  template:
+    src: stop.sh.j2
+    dest: "{{ filebeat_home_dir }}/filebeat-{{ filebeat_version }}/stop.sh"
+    owner: tomcat
+    group: tomcat
+    # mode: 0644
+
+- name: copy shipper templates
+  template:
+    src: shipper.conf.j2
+    dest: "{{ filebeat_home_dir }}/filebeat-{{ filebeat_version }}/shipper.conf"
+    owner: tomcat
+    group: tomcat
+    # mode: 0644
+  notify:
+    - restart filebeat
+  tags: reconfig

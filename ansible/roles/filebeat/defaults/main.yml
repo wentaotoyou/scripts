@@ -1,0 +1,18 @@
+---
+# defaults file for jpnewman.elk-filebeat-shipper
+#which_interface: eth0
+
+filebeat_pkg: 'filebeat-5.2.1-linux-x86_64.tar.gz'
+filebeat_version: 5.2.1
+filebeat_redis_host: '172.18.200.222'
+filebeat_redis_port: 6379
+filebeat_redis_db: 0
+filebeat_redis_key: 'filebeat'
+filebeat_redis_data_type: channel
+
+filebeat_home_dir: "/hrb_data"
+
+filebeat_java_home: "/usr/java"
+
+logfile_path: "/hrb_log/catalina/hrb-*.out"
+logfile_sincedb_path: "{{ filebeat_home_dir }}/filebeat-{{ logstash_version }}"
