@@ -1,0 +1,39 @@
+{% if {{ ansible_hostname }} in {{ front_nodes }} %}
+filebeat.prospectors:
+- input_type: log
+  paths:
+    - /hrb_log/hrb-*/hrb-*_access*.log
+  document_type: access
+  scan_frequency: 10s
+  tail_files: true
+
+{% endif %}
+- input_type: log
+  paths:
+    - /hrb_log/catalina/hrb-*.out
+  document_type: catalina
+  scan_frequency: 1s
+  exclude_lines: ['^登出','^strusteeBankNo','^=============>Sun']
+  tail_files: true
+
+  multiline.pattern: '^[0-9]{4}-[0-9]{2}-[0-9]{2} [0-9]{2}:[0-9]{2}:[0-9]{2},[0-9]{3} \[http'
+  multiline.negate: true
+  multiline.match: after
+  timeout: 300s
+
+output.redis:
+  hosts: ["172.18.200.222:6379"]
+  datatype: "channel"
+  key: "filebeat"
+
+#=============================== Logging ==================================
+#logging.level: info
+#logging.metrics.enabled: true
+logging.metrics.enabled: false
+#logging.metrics.period: 30s
+logging.to_files: true
+logging.files:
+  # path:
+  # name:
+  rotateeverybytes: 10485760 # = 10MB
+  keepfiles: 3

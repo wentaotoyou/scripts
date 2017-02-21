@@ -1,2 +1,2 @@
 ---
-- include: filebeat.yml
+- include: fb.yml

@@ -1,11 +1,65 @@
 #!/bin/bash
-JAVA_HOME={{ logstash_java_home }}
-PATH=$PATH:$JAVA_HOME/bin
 
-pid=`ps aux | grep 'logstash/runner.rb' | grep -v grep | awk '{print $2}'`
-echo $pid
-kill -9 $pid 2>/dev/null
+# Shell Env
+SHELL_NAME="startup.sh"
+SHELL_DIR="."
+SHELL_LOG="${SHELL_DIR}/${SHELL_NAME}.log"
+LOCK_FILE="/tmp/${SHELL_NAME}.lock"
 
-cd {{ logstash_home_dir }}/logstash-{{ logstash_version }}
-rm -rf ./nohup.out
-nohup ./bin/logstash -f ./shipper.conf > ./nohup & 
+#Write Log
+ logger(){
+    LOG_INFO=$1
+    echo "$(date "+%Y-%m-%d") $(date "+%H-%M-%S") : ${SHELL_NAME} : ${LOG_INFO}" >> ${SHELL_LOG}
+}
+
+# Shell Usage
+shell_usage(){
+    echo $"Usage: $0 {backup}"
+}
+
+shell_lock(){
+    touch ${LOCK_FILE}
+}
+
+shell_unlock(){
+    rm -f ${LOCK_FILE}
+}
+
+# reload|stop filebeat
+fb_reload(){
+    pid=$(ps aux | grep 'filebeat' | grep -v grep | awk '{print $2}')
+    logger "filebeat pid: ${pid}"
+    logger "shutdow filebeat"
+    kill -9 $pid 2>/dev/null
+
+    cd {{ filebeat_home_dir }}
+    rm -rf nohup.out
+    nohup ./bin/logstash -f ./shipper.conf &
+    pid=$(ps aux | grep 'filebeat' | grep -v grep | awk '{print $2}')
+    if [ x${pid} = x0 ]; then
+        logger "filebeat started successfull"
+    else
+        logger "filebeat started failed"
+    fi
+}
+
+fb_stop(){
+    pid=$(ps aux | grep 'filebeat' | grep -v grep | awk '{print $2}')
+    kill -9 $pid 2>/dev/null
+}
+
+# Main Function
+main(){
+    case $1 in
+        reload)
+            fb_reload
+            ;;
+        stop)
+            mysql_backup
+            ;;
+        *)
+            shell_usage;
+    esac
+}
+
+main $1

@@ -13,23 +13,15 @@
 - name: copy startup script
   template:
     src: reload.sh.j2
-    dest: "{{ filebeat_home_dir }}/filebeat-{{ filebeat_version }}/reload.sh"
+    dest: "{{ filebeat_home_dir }}/reload.sh"
     owner: tomcat
     group: tomcat
     # mode: 0644
     
-- name: copy stop script
+- name: copy config file
   template:
-    src: stop.sh.j2
-    dest: "{{ filebeat_home_dir }}/filebeat-{{ filebeat_version }}/stop.sh"
-    owner: tomcat
-    group: tomcat
-    # mode: 0644
-
-- name: copy shipper templates
-  template:
-    src: shipper.conf.j2
-    dest: "{{ filebeat_home_dir }}/filebeat-{{ filebeat_version }}/shipper.conf"
+    src: filebeat.yml.j2
+    dest: "{{ filebeat_home_dir }}/filebeat.yml"
     owner: tomcat
     group: tomcat
     # mode: 0644
